@@ -1,0 +1,17 @@
+# Example binaries
+example/go-skipverify-example*
+
+# Binaries
+go-skipverify*
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+.Trash
