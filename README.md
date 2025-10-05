@@ -65,6 +65,30 @@ HTTPS_PROXY=http://127.0.0.1:8080 ./example/go-skipverify-example-Darwin64-patch
 }
 ```
 
+## macOS ARM64
+
+If you are patching a macOS binary it may be killed when trying to run it. It is probably based on the following:
+
+- All system and App Store binaries — and many Go binaries — are code signed.
+- When you edit any byte of a signed section, the signature hash no longer matches.
+- macOS will silently kill the process at launch — no stack trace, no crash report.
+
+You can check the code signature using the following command:
+
+```bash
+codesign --verify --verbose example/go-skipverify-example-patched
+example/go-skipverify-example-patched: invalid signature (code or signature have been modified)
+In architecture: arm64
+```
+
+You can sign the patched binary using the following command:
+
+```bash
+codesign --force --sign - example/go-skipverify-example-patched
+example/go-skipverify-example-patched: replacing existing signature
+```
+
+
 # References
 
 - [CyberArk - How to Bypass Golang SSL Verification](https://www.cyberark.com/resources/threat-research-blog/how-to-bypass-golang-ssl-verification)

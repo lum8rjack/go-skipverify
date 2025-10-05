@@ -79,6 +79,14 @@ var supportedPatches = map[string]Patches{
 			},
 		},
 	},
+	"ARM64": Patches{
+		VersionPatches: []VersionPatch{
+			{GoVersion: "1.25",
+				OldBytes: []byte{0x0A, 0x81, 0x42, 0x39, 0xEA, 0x07, 0x00, 0x37},
+				NewBytes: []byte{0x0A, 0x81, 0x42, 0x39, 0xEA, 0x07, 0x00, 0x36},
+			},
+		},
+	},
 }
 
 type Patches struct {
@@ -145,19 +153,25 @@ func main() {
 	fmt.Printf("File: %s\nOS: %s\nArch: %s\n", fileDetails.Filename, fileDetails.OS, fileDetails.Arch)
 
 	if *outFile != "" {
-		if fileDetails.Arch != "AMD64" {
-			log.Fatalf("Unsupported architecture: %s", fileDetails.Arch)
+		isSupported := false
+		for supportedArch, _ := range supportedPatches {
+			if fileDetails.Arch == supportedArch {
+				for _, patch := range supportedPatches[supportedArch].VersionPatches {
+					if patch.GoVersion == majorVersion {
+						isSupported = true
+						fmt.Printf("Patching for version: %s %s\n", supportedArch, patch.GoVersion)
+						err := patchData(*inFile, *outFile, patch.OldBytes, patch.NewBytes)
+						if err != nil {
+							log.Fatalf("Error patching file: %v\n", err)
+						}
+						fmt.Printf("Successfully patched and saved to: %s\n", *outFile)
+					}
+				}
+			}
 		}
 
-		for _, patch := range supportedPatches["AMD64"].VersionPatches {
-			if patch.GoVersion == majorVersion {
-				fmt.Printf("Patching for version: %s\n", patch.GoVersion)
-				err := patchData(*inFile, *outFile, patch.OldBytes, patch.NewBytes)
-				if err != nil {
-					log.Fatalf("Error patching file: %v\n", err)
-				}
-				fmt.Printf("Successfully patched and saved to: %s\n", *outFile)
-			}
+		if !isSupported {
+			log.Fatalln("Unsupported binary (arch or Go version)")
 		}
 	}
 }
