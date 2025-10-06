@@ -17,6 +17,23 @@ To identify a patch perform the following steps:
 
 ![](assets/go-verifyservercertificate-ghidra.png)
 
+## Install Specific Go Version
+
+You can use Go to install other versions of Go using the example below.
+
+```bash
+# Install go1.24.1
+go install golang.org/dl/go1.24.1@latest
+
+# Then you need to download it
+go1.24.1 download
+
+# Check version
+go1.24.1 version
+go version go1.24.1 darwin/arm64
+
+# Then compile like normal
+```
 
 ## Usage
 
@@ -63,6 +80,17 @@ HTTPS_PROXY=http://127.0.0.1:8080 ./example/go-skipverify-example-Darwin64-patch
   "timezone": "America/Chicago",
   "readme": "https://ipinfo.io/missingauth"
 }
+```
+
+Only supply the "-in" flag if you only want to check if the binary was compiled with Go and which version.
+
+```bash
+./go-skipverify -in example/go-skipverify-example
+Go version: go1.24.1
+Major Go version: 1.24
+File: example/go-skipverify-example
+OS: macOS
+Arch: ARM64
 ```
 
 ## macOS ARM64
